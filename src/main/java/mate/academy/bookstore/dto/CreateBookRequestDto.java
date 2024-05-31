@@ -16,7 +16,7 @@ public record CreateBookRequestDto(
         String author,
 
         @NotBlank(message = "ISBN cannot be blank")
-        @Size(max = 255, message = "ISBN can be at most 255 characters long")
+        @Size(max = 13, message = "ISBN can be at most 13 characters long")
         String isbn,
 
         @NotNull(message = "Price cannot be null")
