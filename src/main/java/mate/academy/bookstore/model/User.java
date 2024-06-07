@@ -6,40 +6,36 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "user")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotNull
+    @NotBlank
     @Column(nullable = false)
-    @Size(min = 8)
+    @Length(min = 8)
     private String password;
 
-    @NotNull
-    @Column(name = "first_name", nullable = false)
+    @NotBlank
+    @Column(nullable = false)
     private String firstName;
 
-    @NotNull
-    @Column(name = "last_name", nullable = false)
+    @NotBlank
+    @Column(nullable = false)
     private String lastName;
 
-    @Column(name = "shipping_address")
     private String shippingAddress;
 }
-
-
-

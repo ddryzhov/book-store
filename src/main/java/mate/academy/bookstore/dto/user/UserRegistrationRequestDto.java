@@ -1,32 +1,32 @@
 package mate.academy.bookstore.dto.user;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import mate.academy.bookstore.validation.FieldMatch;
+import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
 @FieldMatch(first = "password", second = "repeatPassword", message = "Passwords do not match")
 public class UserRegistrationRequestDto {
-    @NotNull
+    @NotBlank
     @Email
     private String email;
 
-    @NotNull
-    @Size(min = 8)
+    @NotBlank
+    @Length(min = 8)
     private String password;
 
-    @NotNull
-    @Size(min = 8)
+    @NotBlank
+    @Length(min = 8)
     private String repeatPassword;
 
-    @NotNull
+    @NotBlank
     private String firstName;
 
-    @NotNull
+    @NotBlank
     private String lastName;
 
     private String shippingAddress;
