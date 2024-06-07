@@ -1,4 +1,4 @@
-package mate.academy.bookstore.dto;
+package mate.academy.bookstore.dto.book;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -6,9 +6,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
-public record BookDto(
-        Long id,
-
+public record CreateBookRequestDto(
         @NotBlank(message = "Title cannot be blank")
         @Size(max = 255, message = "Title can be at most 255 characters long")
         String title,
