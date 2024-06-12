@@ -70,8 +70,6 @@ public class User implements UserDetails {
     }
 
     @Override
-    @NotBlank
-    @Length(min = 8)
     public String getPassword() {
         return password;
     }

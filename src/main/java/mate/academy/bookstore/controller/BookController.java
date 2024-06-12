@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookController {
     private final BookService bookService;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "Get all books with pagination and sorting")
     @GetMapping
     public List<BookDto> getAll(
@@ -49,7 +48,6 @@ public class BookController {
         return bookService.findAll(pageable);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "Get a book by its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the book",
@@ -62,14 +60,14 @@ public class BookController {
         return bookService.findById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create a new book")
     @PostMapping
     public BookDto createBook(@RequestBody @Valid CreateBookRequestDto bookDto) {
         return bookService.save(bookDto);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete a book by its ID")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
@@ -77,7 +75,7 @@ public class BookController {
         bookService.deleteById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update a book by its ID")
     @PutMapping("/{id}")
     public BookDto updateBook(@PathVariable @Positive Long id,
@@ -85,7 +83,6 @@ public class BookController {
         return bookService.update(id, bookDto);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     @Operation(summary = "Search for books with parameters")
     @GetMapping("/search")
     public List<BookDto> searchBooks(BookSearchParameters searchParameters,
