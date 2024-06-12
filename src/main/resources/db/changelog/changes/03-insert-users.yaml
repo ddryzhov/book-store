@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-users
+      author: daniil
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: "admin@example.com"
+              - column:
+                  name: password
+                  value: "${hashedAdminPassword}"
+              - column:
+                  name: first_name
+                  value: "Admin"
+              - column:
+                  name: last_name
+                  value: "User"
+              - column:
+                  name: shipping_address
+                  value: "123 Admin St"
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: "user@example.com"
+              - column:
+                  name: password
+                  value: "${hashedUserPassword}"
+              - column:
+                  name: first_name
+                  value: "Regular"
+              - column:
+                  name: last_name
+                  value: "User"
+              - column:
+                  name: shipping_address
+                  value: "123 User St"
