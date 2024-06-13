@@ -48,7 +48,6 @@ public class User implements UserDetails {
 
     private String shippingAddress;
 
-    @Column(name = "is_deleted")
     private boolean isDeleted;
 
     @ManyToMany
@@ -91,6 +90,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !isDeleted;
     }
 }

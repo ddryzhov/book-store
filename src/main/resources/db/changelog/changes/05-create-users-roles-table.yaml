@@ -16,9 +16,6 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-        - addPrimaryKey:
-            tableName: users_roles
-            columnNames: user_id, role_id
         - addForeignKeyConstraint:
             baseTableName: users_roles
             baseColumnNames: user_id
