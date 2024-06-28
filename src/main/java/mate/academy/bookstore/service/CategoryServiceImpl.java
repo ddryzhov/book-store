@@ -17,10 +17,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> findAll() {
-        return categoryRepository.findAll()
-                .stream()
-                .map(categoryMapper::toDto)
-                .toList();
+        List<Category> categories = categoryRepository.findAll();
+        return categoryMapper.toDtoList(categories);
     }
 
     @Override

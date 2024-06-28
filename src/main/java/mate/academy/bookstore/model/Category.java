@@ -19,8 +19,8 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
+@ToString(exclude = "books")
+@EqualsAndHashCode(exclude = "books")
 @Table(name = "categories")
 public class Category {
     @Id
@@ -34,7 +34,5 @@ public class Category {
     private String description;
 
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<Book> books = new HashSet<>();
 }

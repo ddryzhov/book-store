@@ -26,6 +26,8 @@ public interface BookMapper {
 
     BookDtoWithoutCategoryIds toDtoWithoutCategories(Book book);
 
+    List<BookDtoWithoutCategoryIds> toDtoWithoutCategoriesList(List<Book> books);
+
     @AfterMapping
     default void setCategoryIds(@MappingTarget BookDto bookDto, Book book) {
         if (book.getCategories() != null) {
