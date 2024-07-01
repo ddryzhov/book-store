@@ -8,6 +8,9 @@ import mate.academy.bookstore.dto.shoppingcart.ShoppingCartDto;
 import mate.academy.bookstore.service.ShoppingCartService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,30 +24,40 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/cart")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('USER')")
 public class ShoppingCartController {
     private final ShoppingCartService shoppingCartService;
 
     @GetMapping
+    @PreAuthorize("hasRole('USER')")
     public ShoppingCartDto getShoppingCart() {
         return shoppingCartService.getShoppingCartForUser();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('USER')")
     public ShoppingCartDto addItemToCart(@Valid @RequestBody CreateCartItemRequestDto requestDto) {
         return shoppingCartService.addItemToCart(requestDto);
     }
 
     @PutMapping("/items/{cartItemId}")
+    @PreAuthorize("hasRole('USER')")
     public ShoppingCartDto updateCartItem(@PathVariable Long cartItemId,
                                           @Valid @RequestBody UpdateCartItemRequestDto requestDto) {
-        return shoppingCartService.updateCartItem(cartItemId, requestDto);
+        Long userId = getCurrentUserId();
+        return shoppingCartService.updateCartItem(cartItemId, requestDto, userId);
     }
 
     @DeleteMapping("/items/{cartItemId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('USER')")
     public void removeCartItem(@PathVariable Long cartItemId) {
         shoppingCartService.removeCartItem(cartItemId);
+    }
+
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return Long.valueOf(userDetails.getUsername());
     }
 }
