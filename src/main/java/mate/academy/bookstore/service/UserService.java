@@ -1,5 +1,6 @@
 package mate.academy.bookstore.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.user.UserRegistrationRequestDto;
 import mate.academy.bookstore.exception.RegistrationException;
@@ -13,12 +14,15 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final ShoppingCartServiceImpl shoppingCartServiceImpl;
 
-    public User register(UserRegistrationRequestDto request) throws RegistrationException {
+    public User register(@Valid UserRegistrationRequestDto request) throws RegistrationException {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RegistrationException("Email is already taken");
         }
         User user = userMapper.toEntity(request);
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        shoppingCartServiceImpl.createShoppingCart(user);
+        return user;
     }
 }
