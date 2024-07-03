@@ -45,16 +45,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                         + requestDto.getBookId()));
 
         CartItem cartItem = cartItemRepository.findByShoppingCartAndBook(shoppingCart, book)
-                .orElse(null);
+                .orElseGet(() -> {
+                    CartItem newCartItem = new CartItem();
+                    newCartItem.setShoppingCart(shoppingCart);
+                    newCartItem.setBook(book);
+                    newCartItem.setQuantity(requestDto.getQuantity());
+                    shoppingCart.getCartItems().add(newCartItem);
+                    return newCartItem;
+                });
 
-        if (cartItem != null) {
+        if (cartItem.getId() != null) {
             cartItem.setQuantity(cartItem.getQuantity() + requestDto.getQuantity());
-        } else {
-            cartItem = new CartItem();
-            cartItem.setShoppingCart(shoppingCart);
-            cartItem.setBook(book);
-            cartItem.setQuantity(requestDto.getQuantity());
-            shoppingCart.getCartItems().add(cartItem);
         }
 
         cartItemRepository.save(cartItem);
