@@ -5,12 +5,12 @@ import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.cartitem.CreateCartItemRequestDto;
 import mate.academy.bookstore.dto.cartitem.UpdateCartItemRequestDto;
 import mate.academy.bookstore.dto.shoppingcart.ShoppingCartDto;
+import mate.academy.bookstore.model.User;
 import mate.academy.bookstore.service.ShoppingCartService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,14 +30,16 @@ public class ShoppingCartController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ShoppingCartDto getShoppingCart() {
-        return shoppingCartService.getShoppingCartForUser();
+        Long userId = getCurrentUserId();
+        return shoppingCartService.getShoppingCartForUser(userId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('USER')")
     public ShoppingCartDto addItemToCart(@Valid @RequestBody CreateCartItemRequestDto requestDto) {
-        return shoppingCartService.addItemToCart(requestDto);
+        Long userId = getCurrentUserId();
+        return shoppingCartService.addItemToCart(requestDto, userId);
     }
 
     @PutMapping("/items/{cartItemId}")
@@ -57,7 +59,7 @@ public class ShoppingCartController {
 
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return Long.valueOf(userDetails.getUsername());
+        User user = (User) authentication.getPrincipal();
+        return user.getId();
     }
 }

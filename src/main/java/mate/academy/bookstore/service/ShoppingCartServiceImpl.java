@@ -13,9 +13,6 @@ import mate.academy.bookstore.model.User;
 import mate.academy.bookstore.repository.book.BookRepository;
 import mate.academy.bookstore.repository.cartitem.CartItemRepository;
 import mate.academy.bookstore.repository.shoppingcart.ShoppingCartRepository;
-import mate.academy.bookstore.repository.user.UserRepository;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,30 +22,23 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final CartItemRepository cartItemRepository;
     private final BookRepository bookRepository;
-    private final UserRepository userRepository;
     private final ShoppingCartMapper shoppingCartMapper;
 
     @Override
     @Transactional
-    public ShoppingCartDto getShoppingCartForUser() {
-        User user = getCurrentUser();
-        ShoppingCart shoppingCart = shoppingCartRepository.findByUser(user)
-                .orElseGet(() -> {
-                    createShoppingCart(user);
-                    return shoppingCartRepository.findByUser(user)
-                            .orElseThrow(() -> new EntityNotFoundException("Shopping cart creation "
-                                    + "failed for user " + user.getId()));
-                });
+    public ShoppingCartDto getShoppingCartForUser(Long userId) {
+        ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Shopping cart not found "
+                        + "for user id " + userId));
         return shoppingCartMapper.toDto(shoppingCart);
     }
 
     @Override
     @Transactional
-    public ShoppingCartDto addItemToCart(CreateCartItemRequestDto requestDto) {
-        User user = getCurrentUser();
-        ShoppingCart shoppingCart = shoppingCartRepository.findByUser(user)
-                .orElseThrow(() -> new EntityNotFoundException("Shopping cart not found for user "
-                        + user.getId()));
+    public ShoppingCartDto addItemToCart(CreateCartItemRequestDto requestDto, Long userId) {
+        ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Shopping cart not found "
+                        + "for user id " + userId));
 
         Book book = bookRepository.findById(requestDto.getBookId())
                 .orElseThrow(() -> new EntityNotFoundException("Book not found for id "
@@ -101,13 +91,5 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setUser(user);
         shoppingCartRepository.save(shoppingCart);
-    }
-
-    private User getCurrentUser() {
-        String email = ((UserDetails) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal()).getUsername();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User not found for email "
-                        + email));
     }
 }

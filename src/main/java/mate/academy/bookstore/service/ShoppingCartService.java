@@ -6,9 +6,9 @@ import mate.academy.bookstore.dto.shoppingcart.ShoppingCartDto;
 import mate.academy.bookstore.model.User;
 
 public interface ShoppingCartService {
-    ShoppingCartDto getShoppingCartForUser();
+    ShoppingCartDto getShoppingCartForUser(Long userId);
 
-    ShoppingCartDto addItemToCart(CreateCartItemRequestDto requestDto);
+    ShoppingCartDto addItemToCart(CreateCartItemRequestDto requestDto, Long userId);
 
     ShoppingCartDto updateCartItem(Long cartItemId, UpdateCartItemRequestDto requestDto,
                                    Long userId);
