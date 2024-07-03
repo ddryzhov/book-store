@@ -1,6 +1,5 @@
 package mate.academy.bookstore.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.user.UserRegistrationRequestDto;
 import mate.academy.bookstore.exception.RegistrationException;
@@ -16,7 +15,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final ShoppingCartServiceImpl shoppingCartServiceImpl;
 
-    public User register(@Valid UserRegistrationRequestDto request) throws RegistrationException {
+    public User register(UserRegistrationRequestDto request) throws RegistrationException {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RegistrationException("Email is already taken");
         }
