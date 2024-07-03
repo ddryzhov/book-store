@@ -13,12 +13,15 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final ShoppingCartServiceImpl shoppingCartServiceImpl;
 
     public User register(UserRegistrationRequestDto request) throws RegistrationException {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RegistrationException("Email is already taken");
         }
         User user = userMapper.toEntity(request);
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        shoppingCartServiceImpl.createShoppingCart(user);
+        return user;
     }
 }
