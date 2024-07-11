@@ -61,6 +61,51 @@ public class OrderServiceImpl implements OrderService {
         return orderDto;
     }
 
+    @Override
+    @Transactional
+    public OrderDto updateOrderStatus(Long orderId, Order.Status status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Order with id "
+                        + orderId + " not found"));
+
+        order.setStatus(status);
+        orderRepository.save(order);
+
+        return orderMapper.toDto(order);
+    }
+
+    @Override
+    @Transactional
+    public Set<OrderItemDto> getOrderItems(Long orderId) {
+        Set<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("No items found for order with id "
+                        + orderId));
+
+        return orderItemMapper.map(orderItems);
+    }
+
+    @Override
+    @Transactional
+    public OrderItemDto getOrderItem(Long orderId, Long itemId) {
+        OrderItem orderItem = orderItemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("No item found for order with id "
+                        + orderId));
+
+        if (!orderItem.getOrder().getId().equals(orderId)) {
+            throw new IllegalArgumentException("OrderItem does not belong to the specified Order "
+                    + "with id " + orderId);
+        }
+
+        return orderItemMapper.toDto(orderItem);
+    }
+
+    private BigDecimal calculateTotal(ShoppingCart shoppingCart) {
+        return shoppingCart.getCartItems().stream()
+                .map(cartItem -> cartItem.getBook().getPrice()
+                        .multiply(BigDecimal.valueOf(cartItem.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     private Order createNewOrder(ShoppingCart shoppingCart, BigDecimal total,
                                  String shippingAddress) {
         Order order = new Order();
@@ -86,47 +131,5 @@ public class OrderServiceImpl implements OrderService {
     private void clearShoppingCart(ShoppingCart shoppingCart) {
         shoppingCart.getCartItems().clear();
         shoppingCartRepository.save(shoppingCart);
-    }
-
-    @Override
-    @Transactional
-    public OrderDto updateOrderStatus(Long orderId, Order.Status status) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
-
-        order.setStatus(status);
-        orderRepository.save(order);
-
-        return orderMapper.toDto(order);
-    }
-
-    @Override
-    @Transactional
-    public Set<OrderItemDto> getOrderItems(Long orderId) {
-        Set<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("No items found for order with id "
-                        + orderId));
-
-        return orderItemMapper.map(orderItems);
-    }
-
-    @Override
-    @Transactional
-    public OrderItemDto getOrderItem(Long orderId, Long itemId) {
-        OrderItem orderItem = orderItemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("OrderItem not found"));
-
-        if (!orderItem.getOrder().getId().equals(orderId)) {
-            throw new IllegalArgumentException("OrderItem does not belong to the specified Order");
-        }
-
-        return orderItemMapper.toDto(orderItem);
-    }
-
-    private BigDecimal calculateTotal(ShoppingCart shoppingCart) {
-        return shoppingCart.getCartItems().stream()
-                .map(cartItem -> cartItem.getBook().getPrice()
-                        .multiply(BigDecimal.valueOf(cartItem.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

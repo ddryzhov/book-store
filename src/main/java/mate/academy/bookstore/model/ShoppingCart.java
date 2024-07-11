@@ -26,7 +26,7 @@ import org.hibernate.annotations.SQLRestriction;
 @ToString(exclude = "cartItems")
 @EqualsAndHashCode(exclude = "cartItems")
 @SQLDelete(sql = "UPDATE shopping_cart SET is_deleted = true WHERE id=?")
-@SQLRestriction("is_deleted=FALSE")
+@SQLRestriction("is_deleted = FALSE")
 @Table(name = "shopping_carts")
 public class ShoppingCart {
     @Id
