@@ -32,10 +32,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public List<OrderDto> getOrders(Long userId) {
-        List<Order> orders = orderRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("No orders found for user with id "
-                        + userId));
-
+        List<Order> orders = orderRepository.findByUserId(userId);
+        if (orders.isEmpty()) {
+            throw new EntityNotFoundException("No orders found "
+                    + "for user with id " + userId);
+        }
         return orderMapper.map(orders);
     }
 
