@@ -1,5 +1,6 @@
 package mate.academy.bookstore.service;
 
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.user.UserRegistrationRequestDto;
 import mate.academy.bookstore.exception.RegistrationException;
@@ -25,7 +26,7 @@ public class UserService {
         User user = userMapper.toEntity(request);
         Role defaultRole = roleRepository.findByRole(Role.RoleName.ROLE_USER)
                 .orElseThrow(() -> new RuntimeException("Default role not found"));
-        user.addRole(defaultRole);
+        user.setRoles(Set.of(defaultRole));
         user = userRepository.save(user);
         shoppingCartServiceImpl.createShoppingCart(user);
         return user;
