@@ -9,6 +9,7 @@ import mate.academy.bookstore.model.Role;
 import mate.academy.bookstore.model.User;
 import mate.academy.bookstore.repository.role.RoleRepository;
 import mate.academy.bookstore.repository.user.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,12 +19,14 @@ public class UserService {
     private final UserMapper userMapper;
     private final ShoppingCartServiceImpl shoppingCartServiceImpl;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public User register(UserRegistrationRequestDto request) throws RegistrationException {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RegistrationException("Email is already taken");
         }
         User user = userMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         Role defaultRole = roleRepository.findByRole(Role.RoleName.ROLE_USER)
                 .orElseThrow(() -> new RuntimeException("Default role not found"));
         user.setRoles(Set.of(defaultRole));
