@@ -12,15 +12,16 @@ import org.hibernate.validator.constraints.Length;
 @FieldMatch(first = "password", second = "repeatPassword", message = "Passwords do not match")
 public class UserRegistrationRequestDto {
     @NotBlank
+    @Length(min = 8, max = 20)
     @Email
     private String email;
 
     @NotBlank
-    @Length(min = 8)
+    @Length(min = 8, max = 20)
     private String password;
 
     @NotBlank
-    @Length(min = 8)
+    @Length(min = 8, max = 20)
     private String repeatPassword;
 
     @NotBlank
