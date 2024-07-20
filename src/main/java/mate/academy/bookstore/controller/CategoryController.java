@@ -64,6 +64,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = @Content)
     })
+    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public List<CategoryDto> getAll() {
         return categoryService.findAll();
@@ -81,6 +82,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)
     })
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
     public CategoryDto getCategoryById(@PathVariable Long id) {
         return categoryService.getById(id);
@@ -137,6 +139,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)
     })
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}/books")
     public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(@PathVariable Long id) {
         return bookService.findAllByCategoryId(id);
