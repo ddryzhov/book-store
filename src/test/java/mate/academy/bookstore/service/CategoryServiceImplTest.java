@@ -33,18 +33,22 @@ class CategoryServiceImplTest {
     @InjectMocks
     private CategoryServiceImpl categoryService;
 
+    private Category category;
+    private CategoryDto categoryDto;
+    private Long id;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        id = 1L;
+        category = new Category();
+        categoryDto = new CategoryDto();
     }
 
     @Test
     void findAll_ReturnsCategoryDtoList() {
-        Category category = new Category();
-        CategoryDto categoryDto = new CategoryDto();
         when(categoryRepository.findAll()).thenReturn(Collections.singletonList(category));
-        when(categoryMapper.toDtoList(anyList()))
-                .thenReturn(Collections.singletonList(categoryDto));
+        when(categoryMapper.toDtoList(anyList())).thenReturn(Collections.singletonList(categoryDto));
 
         List<CategoryDto> result = categoryService.findAll();
 
@@ -56,9 +60,6 @@ class CategoryServiceImplTest {
 
     @Test
     void getById_ValidId_ReturnsCategoryDto() {
-        Long id = 1L;
-        Category category = new Category();
-        CategoryDto categoryDto = new CategoryDto();
         when(categoryRepository.findById(id)).thenReturn(Optional.of(category));
         when(categoryMapper.toDto(category)).thenReturn(categoryDto);
 
@@ -71,7 +72,6 @@ class CategoryServiceImplTest {
 
     @Test
     void getById_InvalidId_ThrowsEntityNotFoundException() {
-        Long id = 1L;
         when(categoryRepository.findById(id)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
@@ -83,8 +83,6 @@ class CategoryServiceImplTest {
 
     @Test
     void save_ValidCategoryDto_ReturnsCategoryDto() {
-        CategoryDto categoryDto = new CategoryDto();
-        Category category = new Category();
         when(categoryMapper.toEntity(categoryDto)).thenReturn(category);
         when(categoryRepository.save(category)).thenReturn(category);
         when(categoryMapper.toDto(category)).thenReturn(categoryDto);
@@ -99,9 +97,6 @@ class CategoryServiceImplTest {
 
     @Test
     void update_ValidIdAndCategoryDto_ReturnsUpdatedCategoryDto() {
-        Long id = 1L;
-        CategoryDto categoryDto = new CategoryDto();
-        Category category = new Category();
         when(categoryRepository.findById(id)).thenReturn(Optional.of(category));
         when(categoryRepository.save(category)).thenReturn(category);
         when(categoryMapper.toDto(category)).thenReturn(categoryDto);
@@ -116,8 +111,6 @@ class CategoryServiceImplTest {
 
     @Test
     void update_InvalidId_ThrowsEntityNotFoundException() {
-        Long id = 1L;
-        CategoryDto categoryDto = new CategoryDto();
         when(categoryRepository.findById(id)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
@@ -129,8 +122,6 @@ class CategoryServiceImplTest {
 
     @Test
     void deleteById_ValidId_DeletesCategory() {
-        Long id = 1L;
-
         categoryService.deleteById(id);
 
         verify(categoryRepository, times(1)).deleteById(id);
