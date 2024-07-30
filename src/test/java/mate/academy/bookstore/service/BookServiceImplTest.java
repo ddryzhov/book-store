@@ -37,10 +37,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 class BookServiceImplTest {
-
-    @InjectMocks
-    private BookServiceImpl bookService;
-
     @Mock
     private BookRepository bookRepository;
 
@@ -53,19 +49,39 @@ class BookServiceImplTest {
     @Mock
     private CategoryRepository categoryRepository;
 
+    @InjectMocks
+    private BookServiceImpl bookService;
+
+    private Book book;
+    private BookDto bookDto;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        book = new Book();
+        book.setId(1L);
+        book.setTitle("Book Title");
+        book.setAuthor("Book Author");
+        book.setIsbn("1111111111111");
+        book.setPrice(new BigDecimal("12.9900"));
+        book.setDescription("Book Description");
+        book.setCoverImage("cover.jpg");
+
+        bookDto = new BookDto()
+                .setId(1L)
+                .setTitle("Book Title")
+                .setAuthor("Book Author")
+                .setIsbn("1111111111111")
+                .setPrice(new BigDecimal("12.9900"))
+                .setDescription("Book Description")
+                .setCoverImage("cover.jpg");
     }
 
     @Test
     void save_ShouldSaveBook() {
-        Book book = new Book();
-        book.setId(1L);
-
         when(bookMapper.toEntity(any(CreateBookRequestDto.class))).thenReturn(book);
         when(bookRepository.save(any(Book.class))).thenReturn(book);
-        when(bookMapper.toDto(any(Book.class))).thenReturn(new BookDto().setId(1L));
+        when(bookMapper.toDto(any(Book.class))).thenReturn(bookDto);
 
         CreateBookRequestDto requestDto = new CreateBookRequestDto()
                 .setTitle("New Book")
@@ -86,12 +102,10 @@ class BookServiceImplTest {
     @Test
     void findAll_ShouldReturnAllBooks() {
         Pageable pageable = mock(Pageable.class);
-        Book book = new Book();
-        book.setId(1L);
         Page<Book> bookPage = new PageImpl<>(List.of(book));
 
         when(bookRepository.findAll(pageable)).thenReturn(bookPage);
-        when(bookMapper.toDto(any(Book.class))).thenReturn(new BookDto().setId(1L));
+        when(bookMapper.toDto(any(Book.class))).thenReturn(bookDto);
 
         List<BookDto> result = bookService.findAll(pageable);
 
@@ -102,11 +116,8 @@ class BookServiceImplTest {
 
     @Test
     void findById_ShouldReturnBook() {
-        Book book = new Book();
-        book.setId(1L);
-
         when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-        when(bookMapper.toDto(any(Book.class))).thenReturn(new BookDto().setId(1L));
+        when(bookMapper.toDto(any(Book.class))).thenReturn(bookDto);
 
         BookDto result = bookService.findById(1L);
 
@@ -132,7 +143,7 @@ class BookServiceImplTest {
 
     @Test
     void update_ShouldUpdateBook() {
-        final BookDto bookDto = new BookDto()
+        BookDto updatedBookDto = new BookDto()
                 .setId(1L)
                 .setTitle("Updated Book")
                 .setAuthor("Updated Author")
@@ -141,28 +152,25 @@ class BookServiceImplTest {
                 .setDescription("Updated Description")
                 .setCoverImage("updated.jpg");
 
-        Book existingBook = new Book();
-        existingBook.setId(1L);
+        when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+        when(bookMapper.toDto(any(Book.class))).thenReturn(updatedBookDto);
 
-        when(bookRepository.findById(anyLong())).thenReturn(Optional.of(existingBook));
-        when(bookRepository.save(any(Book.class))).thenReturn(existingBook);
-        when(bookMapper.toDto(any(Book.class))).thenReturn(bookDto);
-
-        BookDto result = bookService.update(1L, bookDto);
+        BookDto result = bookService.update(1L, updatedBookDto);
 
         assertNotNull(result);
         assertEquals("Updated Book", result.getTitle());
-        verify(bookRepository, times(1)).save(existingBook);
+        verify(bookRepository, times(1)).save(book);
     }
 
     @Test
     void update_ShouldThrowException_WhenBookNotFound() {
-        BookDto bookDto = new BookDto();
+        BookDto updatedBookDto = new BookDto();
 
         when(bookRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> bookService.update(1L, bookDto));
+                () -> bookService.update(1L, updatedBookDto));
 
         assertEquals("Can't find book by id 1", exception.getMessage());
     }
@@ -172,8 +180,6 @@ class BookServiceImplTest {
         BookSearchParameters searchParameters = new BookSearchParameters(
                 new String[]{"Dune"}, new String[]{"Frank Herbert"}
         );
-        Book book = new Book();
-        book.setId(1L);
         Page<Book> bookPage = new PageImpl<>(List.of(book));
 
         Specification<Book> spec = Specification.where(null);
@@ -183,7 +189,7 @@ class BookServiceImplTest {
                 ArgumentMatchers.<Specification<Book>>any(),
                 any(Pageable.class))
         ).thenReturn(bookPage);
-        when(bookMapper.toDto(any(Book.class))).thenReturn(new BookDto().setId(1L));
+        when(bookMapper.toDto(any(Book.class))).thenReturn(bookDto);
 
         Pageable pageable = mock(Pageable.class);
         List<BookDto> result = bookService.search(searchParameters, pageable);
@@ -195,9 +201,6 @@ class BookServiceImplTest {
 
     @Test
     void findAllByCategoryId_ShouldReturnBooks() {
-        Book book = new Book();
-        book.setId(1L);
-
         when(bookRepository.findAll()).thenReturn(List.of(book));
         when(bookMapper.toDtoWithoutCategoriesList(anyList())).thenReturn(List.of(
                 new BookDtoWithoutCategoryIds(
