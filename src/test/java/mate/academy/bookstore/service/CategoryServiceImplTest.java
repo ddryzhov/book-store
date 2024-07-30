@@ -48,7 +48,8 @@ class CategoryServiceImplTest {
     @Test
     void findAll_ReturnsCategoryDtoList() {
         when(categoryRepository.findAll()).thenReturn(Collections.singletonList(category));
-        when(categoryMapper.toDtoList(anyList())).thenReturn(Collections.singletonList(categoryDto));
+        when(categoryMapper.toDtoList(anyList())).thenReturn(Collections
+                .singletonList(categoryDto));
 
         List<CategoryDto> result = categoryService.findAll();
 
