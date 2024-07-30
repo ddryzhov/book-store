@@ -42,6 +42,9 @@ public class CategoryControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private DataSource dataSource;
+
     @BeforeAll
     static void beforeAll(
             @Autowired WebApplicationContext applicationContext
@@ -62,10 +65,18 @@ public class CategoryControllerTest {
                 dataSource,
                 "mate/academy/bookstore/database/books/add-books.sql"
         );
+        executeSqlScript(
+                dataSource,
+                "mate/academy/bookstore/database/books/add-book-category.sql"
+        );
     }
 
     @AfterEach
     void teardown(@Autowired DataSource dataSource) throws SQLException {
+        executeSqlScript(
+                dataSource,
+                "mate/academy/bookstore/database/books/remove-book-category.sql"
+        );
         executeSqlScript(
                 dataSource,
                 "mate/academy/bookstore/database/categories/remove-categories.sql"
@@ -159,11 +170,6 @@ public class CategoryControllerTest {
                 "1111111111111", new BigDecimal("9.9900"),
                 "Science", "dune.jpg")
         );
-        expected.add(new BookDtoWithoutCategoryIds(
-                2L, "The Hobbit", "Tolkien",
-                "2222222222222", new BigDecimal("8.9900"),
-                "Fantasy", "hobbit.jpg")
-        );
 
         MvcResult result = mockMvc.perform(get("/categories/1/books")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -208,6 +214,9 @@ public class CategoryControllerTest {
     @Test
     @DisplayName("Delete a category by its ID")
     public void deleteCategory_ValidId_DeletesCategory() throws Exception {
+        executeSqlScript(dataSource,
+                "mate/academy/bookstore/database/books/remove-book-category.sql");
+
         mockMvc.perform(
                         delete("/categories/1")
                                 .contentType(MediaType.APPLICATION_JSON)

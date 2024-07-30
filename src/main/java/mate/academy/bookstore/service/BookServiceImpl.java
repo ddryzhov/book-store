@@ -77,7 +77,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDtoWithoutCategoryIds> findAllByCategoryId(Long id) {
-        List<Book> books = bookRepository.findAll();
+        List<Book> books = bookRepository.findAllByCategoryId(id);
         return bookMapper.toDtoWithoutCategoriesList(books);
     }
 
