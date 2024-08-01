@@ -35,6 +35,7 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final BookService bookService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create a new category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Category created",
@@ -47,13 +48,13 @@ public class CategoryController {
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = @Content)
     })
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto createCategory(@RequestBody @Valid CategoryDto categoryDto) {
         return categoryService.save(categoryDto);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get all categories")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categories retrieved",
@@ -64,12 +65,12 @@ public class CategoryController {
             @ApiResponse(responseCode = "403", description = "Forbidden",
                     content = @Content)
     })
-    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public List<CategoryDto> getAll() {
         return categoryService.findAll();
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get a category by its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Category retrieved",
@@ -82,12 +83,12 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)
     })
-    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
     public CategoryDto getCategoryById(@PathVariable Long id) {
         return categoryService.getById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update a category by its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Category updated",
@@ -102,13 +103,13 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)
     })
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public CategoryDto updateCategory(@PathVariable Long id,
                                       @RequestBody @Valid CategoryDto categoryDto) {
         return categoryService.update(id, categoryDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete a category by its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Category deleted",
@@ -120,13 +121,13 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)
     })
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable Long id) {
         categoryService.deleteById(id);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get books by category ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Books retrieved",
@@ -139,7 +140,6 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content)
     })
-    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}/books")
     public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(@PathVariable Long id) {
         return bookService.findAllByCategoryId(id);

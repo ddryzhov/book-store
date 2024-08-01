@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ShoppingCartController {
     private final ShoppingCartService shoppingCartService;
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get the current user's shopping cart")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Shopping cart retrieved",
@@ -47,12 +48,12 @@ public class ShoppingCartController {
                     content = @Content)
     })
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
     public ShoppingCartDto getShoppingCart() {
         Long userId = getCurrentUserId();
         return shoppingCartService.getShoppingCartForUser(userId);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Add an item to the shopping cart")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Item added to cart",
@@ -67,12 +68,12 @@ public class ShoppingCartController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('USER')")
     public ShoppingCartDto addItemToCart(@Valid @RequestBody CreateCartItemRequestDto requestDto) {
         Long userId = getCurrentUserId();
         return shoppingCartService.addItemToCart(requestDto, userId);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Update an item in the shopping cart")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Item updated in cart",
@@ -88,13 +89,13 @@ public class ShoppingCartController {
                     content = @Content)
     })
     @PutMapping("/items/{cartItemId}")
-    @PreAuthorize("hasRole('USER')")
     public ShoppingCartDto updateCartItem(@PathVariable Long cartItemId,
                                           @Valid @RequestBody UpdateCartItemRequestDto requestDto) {
         Long userId = getCurrentUserId();
         return shoppingCartService.updateCartItem(cartItemId, requestDto, userId);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Remove an item from the shopping cart")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Item removed from cart",
@@ -108,7 +109,6 @@ public class ShoppingCartController {
     })
     @DeleteMapping("/items/{cartItemId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('USER')")
     public void removeCartItem(@PathVariable Long cartItemId) {
         shoppingCartService.removeCartItem(cartItemId);
     }

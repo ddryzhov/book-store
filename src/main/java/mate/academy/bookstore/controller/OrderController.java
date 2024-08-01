@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
     private final OrderService orderService;
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Create a new order")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Order created",
@@ -50,12 +51,12 @@ public class OrderController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('USER')")
     public OrderDto createOrder(@Valid @RequestBody CreateOrderRequestDto createOrderRequestDto) {
         Long userId = getCurrentUserId();
         return orderService.createOrder(userId, createOrderRequestDto);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get all orders for the current user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Orders retrieved",
@@ -70,12 +71,12 @@ public class OrderController {
     })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('USER')")
     public List<OrderDto> getOrders() {
         Long userId = getCurrentUserId();
         return orderService.getOrders(userId);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update order status by order ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Order updated",
@@ -92,12 +93,12 @@ public class OrderController {
     })
     @PatchMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN')")
     public OrderDto updateOrder(@PathVariable Long orderId,
                                 @Valid @RequestBody UpdateOrderRequestDto updateOrderRequestDto) {
         return orderService.updateOrderStatus(orderId, updateOrderRequestDto.getStatus());
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get all items for a specific order")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Order items retrieved",
@@ -112,11 +113,11 @@ public class OrderController {
     })
     @GetMapping("/{orderId}/items")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('USER')")
     public Set<OrderItemDto> getOrderItems(@PathVariable Long orderId) {
         return orderService.getOrderItems(orderId);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get a specific item from an order")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Order item retrieved",
@@ -131,7 +132,6 @@ public class OrderController {
     })
     @GetMapping("/{orderId}/items/{itemId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('USER')")
     public OrderItemDto getOrderItem(@PathVariable Long orderId, @PathVariable Long itemId) {
         return orderService.getOrderItem(orderId, itemId);
     }

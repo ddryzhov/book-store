@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BookController {
     private final BookService bookService;
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get all books with pagination and sorting")
     @GetMapping
     public List<BookDto> getAll(
@@ -49,7 +49,7 @@ public class BookController {
         return bookService.findAll(pageable);
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Get a book by its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the book",
@@ -86,7 +86,7 @@ public class BookController {
         return bookService.update(id, bookDto);
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "Search for books with parameters")
     @GetMapping("/search")
     public List<BookDto> searchBooks(BookSearchParameters searchParameters,
